@@ -20,6 +20,9 @@ int main() {
   t_max = 100;
   dt = 0.1;
 
+  x_list.push_back(x - dt * v);
+  v_list.push_back(v);
+
   // Euler integration
   for (t = 0; t <= t_max; t = t + dt) {
 
@@ -28,9 +31,10 @@ int main() {
     x_list.push_back(x);
     v_list.push_back(v);
 
+
     // calculate new position and velocity
     a = -k * x / m;
-    x = x + dt * v;
+    x = (2 * x) - x_list.end()[-2] + (dt*dt*a);
     v = v + dt * a;
 
   }

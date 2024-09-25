@@ -24,6 +24,7 @@
 #else
 #include <GL/glut.h>
 #endif
+#include <vector>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -195,6 +196,8 @@ extern int stabilized_attitude_angle;
 
 #endif
 
+static vector<vector3d> x_list;
+
 // Function prototypes
 void invert (double m[], double mout[]);
 void xyz_euler_to_matrix (vector3d ang, double m[]);
@@ -232,7 +235,10 @@ void refresh_all_subwindows (void);
 bool safe_to_deploy_parachute (void);
 void update_visualization (void);
 void attitude_stabilization (void);
+float lander_mass(void);
 vector3d thrust_wrt_world (void);
+vector3d gravity_wrt_world(void);
+vector3d drag_wrt_world(void);
 void autopilot (void);
 void numerical_dynamics (void);
 void initialize_simulation (void);

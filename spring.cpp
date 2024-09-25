@@ -8,7 +8,7 @@ int main() {
 
   // declare variables
   double m, k, x, v, t_max, dt, t, a;
-  vector<double> t_list, x_list, v_list;
+  extern vector<double> t_list, x_list, v_list;
 
   // mass, spring constant, initial position and velocity
   m = 1;

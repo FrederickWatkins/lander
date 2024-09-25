@@ -20,11 +20,39 @@ void autopilot (void)
   // INSERT YOUR CODE HERE
 }
 
+float lander_mass(void)
+{
+  return fuel * FUEL_DENSITY + UNLOADED_LANDER_MASS;
+}
+
+vector3d gravity_wrt_world(void)
+{
+  vector3d a = -(GRAVITY * MARS_MASS * position.norm()) / pow(position.abs(), 2);
+  return a;
+}
+
+vector3d drag_wrt_world(void)
+{
+  float area = 0.5 * M_PI * pow(LANDER_SIZE, 2);
+  vector3d f = -0.5 * atmospheric_density(position) * DRAG_COEF_LANDER * area * velocity * velocity.abs();
+  if(parachute_status == DEPLOYED){
+    area = 5 * pow(2 * LANDER_SIZE, 2);
+    f += -0.5 * atmospheric_density(position) * DRAG_COEF_CHUTE * area * velocity * velocity.abs();
+  }
+  return f / lander_mass();
+}
+
 void numerical_dynamics (void)
   // This is the function that performs the numerical integration to update the
   // lander's pose. The time step is delta_t (global variable).
 {
-  // INSERT YOUR CODE HERE
+
+  x_list.push_back(position);
+
+  vector3d a = (thrust_wrt_world() / lander_mass()) + gravity_wrt_world() + drag_wrt_world();
+
+  position = (2 * position) - x_list.end()[-2] + (delta_t * delta_t * a);
+  velocity = (position - x_list.end()[-1]) / delta_t;
 
   // Here we can apply an autopilot to adjust the thrust, parachute and attitude
   if (autopilot_enabled) autopilot();
@@ -136,4 +164,5 @@ void initialize_simulation (void)
     break;
 
   }
+  x_list.push_back(position - delta_t * velocity);
 }

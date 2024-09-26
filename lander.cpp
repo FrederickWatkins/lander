@@ -17,7 +17,14 @@
 void autopilot (void)
   // Autopilot to adjust the engine throttle, parachute and attitude control
 {
-  // INSERT YOUR CODE HERE
+  double KH = 100000;
+  double KP = 0.00000012;
+  double delta = 0.1;
+  double descent_rate = velocity * position;
+  double altitude = position.abs() - MARS_RADIUS;
+  double error_term = -(0.5 + descent_rate + KH * altitude);
+  throttle = KP * error_term + delta;
+  printf("%f, %f\n", descent_rate, -0.5 * KH * altitude);
 }
 
 float lander_mass(void)

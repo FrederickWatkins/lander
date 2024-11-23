@@ -70,7 +70,7 @@
 #define LANDER_SIZE 1.0 // (m)
 #define UNLOADED_LANDER_MASS 100.0 // (kg)
 #define FUEL_CAPACITY 100.0 // (l)
-#define FUEL_RATE_AT_MAX_THRUST 0.0 // (l/s)
+#define FUEL_RATE_AT_MAX_THRUST 0.5 // (l/s)
 #define FUEL_DENSITY 1.0 // (kg/l)
 // MAX_THRUST, as defined below, is 1.5 * weight of fully loaded lander at surface
 #define MAX_THRUST (1.5 * (FUEL_DENSITY*FUEL_CAPACITY+UNLOADED_LANDER_MASS) * (GRAVITY*MARS_MASS/(MARS_RADIUS*MARS_RADIUS))) // (N)
@@ -235,7 +235,7 @@ void refresh_all_subwindows (void);
 bool safe_to_deploy_parachute (void);
 void update_visualization (void);
 void attitude_stabilization (void);
-float lander_mass(void);
+double lander_mass(void);
 vector3d thrust_wrt_world (void);
 vector3d gravity_wrt_world(void);
 vector3d drag_wrt_world(void);

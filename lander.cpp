@@ -17,33 +17,29 @@
 void autopilot (void)
   // Autopilot to adjust the engine throttle, parachute and attitude control
 {
-  static double prev_r;
-  double target_altitude;
-  if(int(simulation_time) % 240 < 60){
-    target_altitude = 500;
-  }
-  else if(int(simulation_time) % 240 < 120) {
-    target_altitude = 1000;
-  }
-  else if(int(simulation_time) % 240 < 180) {
-    target_altitude = 500;
-  }
-  else{
-    target_altitude = 1;
-  }
-  double f_eq = GRAVITY * MARS_MASS * lander_mass() / pow((MARS_RADIUS + target_altitude), 2);
-  double KP = -0.0045;
-  double KD = -0.052;
-  double descent_rate = velocity * position;
+  double target_altitude = 0;
+  double descent_rate = velocity * position/position.abs();
   double altitude = position.abs() - MARS_RADIUS;
   double r = altitude - target_altitude;
-  double dr = r - prev_r;
-  prev_r = r;
-  double f = KP * r + KD * dr/delta_t;
-  throttle = (f_eq) / MAX_THRUST + f;
+  if(abs(r) > 50){
+    double max_accel = MAX_THRUST / lander_mass() - GRAVITY * MARS_MASS / position.abs2();
+    if(r - 25 < -(descent_rate*abs(descent_rate))/(2*max_accel)){
+      throttle = 1;
+    }
+    else{
+      throttle = 0;
+    }
+  }
+  else{
+    double f_eq = GRAVITY * MARS_MASS * lander_mass() / pow((MARS_RADIUS + target_altitude), 2);
+    double KP = -0.02;
+    double KD = -0.1;
+    double f = KP * r + KD * descent_rate;
+    throttle = (f_eq) / MAX_THRUST + f;
+  }
 }
 
-float lander_mass(void)
+double lander_mass(void)
 {
   return FUEL_CAPACITY * fuel * FUEL_DENSITY + UNLOADED_LANDER_MASS;
 }

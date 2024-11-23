@@ -17,19 +17,35 @@
 void autopilot (void)
   // Autopilot to adjust the engine throttle, parachute and attitude control
 {
-  double KH = 100000;
-  double KP = 0.00000012;
-  double delta = 0.1;
+  static double prev_r;
+  double target_altitude;
+  if(int(simulation_time) % 240 < 60){
+    target_altitude = 500;
+  }
+  else if(int(simulation_time) % 240 < 120) {
+    target_altitude = 1000;
+  }
+  else if(int(simulation_time) % 240 < 180) {
+    target_altitude = 500;
+  }
+  else{
+    target_altitude = 1;
+  }
+  double f_eq = GRAVITY * MARS_MASS * lander_mass() / pow((MARS_RADIUS + target_altitude), 2);
+  double KP = -0.0045;
+  double KD = -0.052;
   double descent_rate = velocity * position;
   double altitude = position.abs() - MARS_RADIUS;
-  double error_term = -(0.5 + descent_rate + KH * altitude);
-  throttle = KP * error_term + delta;
-  printf("%f, %f\n", descent_rate, -0.5 * KH * altitude);
+  double r = altitude - target_altitude;
+  double dr = r - prev_r;
+  prev_r = r;
+  double f = KP * r + KD * dr/delta_t;
+  throttle = (f_eq) / MAX_THRUST + f;
 }
 
 float lander_mass(void)
 {
-  return fuel * FUEL_DENSITY + UNLOADED_LANDER_MASS;
+  return FUEL_CAPACITY * fuel * FUEL_DENSITY + UNLOADED_LANDER_MASS;
 }
 
 vector3d gravity_wrt_world(void)
@@ -85,9 +101,9 @@ void initialize_simulation (void)
   scenario_description[3] = "polar launch at escape velocity (but drag prevents escape)";
   scenario_description[4] = "elliptical orbit that clips the atmosphere and decays";
   scenario_description[5] = "descent from 200km";
-  scenario_description[6] = "";
-  scenario_description[7] = "";
-  scenario_description[8] = "";
+  scenario_description[6] = "500m static";
+  scenario_description[7] = "510m static";
+  scenario_description[8] = "700m descent";
   scenario_description[9] = "";
 
   switch (scenario) {
@@ -155,19 +171,51 @@ void initialize_simulation (void)
     delta_t = 0.1;
     parachute_status = NOT_DEPLOYED;
     stabilized_attitude = true;
-    autopilot_enabled = false;
+    autopilot_enabled = true;
     break;
 
   case 6:
+    // a descent from rest at 500m altitude
+    position = vector3d(0.0, -(MARS_RADIUS + 500.0), 0.0);
+    velocity = vector3d(0.0, 0.0, 0.0);
+    orientation = vector3d(0.0, 0.0, 90.0);
+    delta_t = 0.01;
+    parachute_status = NOT_DEPLOYED;
+    stabilized_attitude = true;
+    autopilot_enabled = true;
     break;
 
   case 7:
+    // a descent from rest at 510m altitude
+    position = vector3d(0.0, -(MARS_RADIUS + 510.0), 0.0);
+    velocity = vector3d(0.0, 0.0, 0.0);
+    orientation = vector3d(0.0, 0.0, 90.0);
+    delta_t = 0.01;
+    parachute_status = NOT_DEPLOYED;
+    stabilized_attitude = true;
+    autopilot_enabled = true;
     break;
 
   case 8:
+    // a descent from rest at 700 altitude
+    position = vector3d(0.0, -(MARS_RADIUS + 700.0), 0.0);
+    velocity = vector3d(0.0, 0.0, 0.0);
+    orientation = vector3d(0.0, 0.0, 90.0);
+    delta_t = 0.01;
+    parachute_status = NOT_DEPLOYED;
+    stabilized_attitude = true;
+    autopilot_enabled = true;
     break;
 
   case 9:
+    // a descent from rest at 1 altitude
+    position = vector3d(0.0, -(MARS_RADIUS + 1.0), 0.0);
+    velocity = vector3d(0.0, 0.0, 0.0);
+    orientation = vector3d(0.0, 0.0, 90.0);
+    delta_t = 0.01;
+    parachute_status = NOT_DEPLOYED;
+    stabilized_attitude = true;
+    autopilot_enabled = true;
     break;
 
   }
